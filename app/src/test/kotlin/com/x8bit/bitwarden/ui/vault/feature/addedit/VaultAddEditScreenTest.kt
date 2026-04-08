@@ -3516,7 +3516,7 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
 
         composeTestRule
             .onAllNodesWithContentDescriptionAfterScroll("Edit")
-            .onFirst()
+            .onLast()
             .performClick()
 
         composeTestRule
@@ -3527,14 +3527,115 @@ class VaultAddEditScreenTest : BitwardenComposeTest() {
             viewModel.trySendAction(
                 VaultAddEditAction.Common.CustomFieldActionSelect(
                     customFieldAction = CustomFieldAction.MOVE_UP,
-                    customField = VaultAddEditState.Custom.BooleanField(
-                        itemId = "Test ID 1",
-                        name = "TestBoolean",
-                        value = false,
+                    customField = VaultAddEditState.Custom.HiddenField(
+                        itemId = "Test ID 3",
+                        name = "TestHidden",
+                        value = "TestHiddenVal",
                     ),
                 ),
             )
         }
+    }
+
+    @Test
+    fun `clicking first custom field edit icon only shows move down action in dialog`() {
+        mutableStateFlow.value = DEFAULT_STATE_SECURE_NOTES_CUSTOM_FIELDS
+
+        // Expand the additional options UI before interacting with it
+        composeTestRule
+            .onNodeWithTextAfterScroll(text = "Additional options")
+            .performClick()
+
+        composeTestRule
+            .onAllNodesWithContentDescriptionAfterScroll("Edit")
+            .onFirst()
+            .performClick()
+
+        composeTestRule
+            .onNodeWithText("Move Up")
+            .assertIsNotDisplayed()
+
+        composeTestRule
+            .onNodeWithText("Move down")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `clicking middle custom field edit icon shows both move actions in dialog`() {
+        mutableStateFlow.value = DEFAULT_STATE_SECURE_NOTES_CUSTOM_FIELDS
+
+        // Expand the additional options UI before interacting with it
+        composeTestRule
+            .onNodeWithTextAfterScroll(text = "Additional options")
+            .performClick()
+
+        composeTestRule
+            .onAllNodesWithContentDescriptionAfterScroll("Edit")[1]
+            .performClick()
+
+        composeTestRule
+            .onNodeWithText("Move Up")
+            .assertIsDisplayed()
+
+        composeTestRule
+            .onNodeWithText("Move down")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `clicking last custom field edit icon only shows move up action in dialog`() {
+        mutableStateFlow.value = DEFAULT_STATE_SECURE_NOTES_CUSTOM_FIELDS
+
+        // Expand the additional options UI before interacting with it
+        composeTestRule
+            .onNodeWithTextAfterScroll(text = "Additional options")
+            .performClick()
+
+        composeTestRule
+            .onAllNodesWithContentDescriptionAfterScroll("Edit")
+            .onLast()
+            .performClick()
+
+        composeTestRule
+            .onNodeWithText("Move Up")
+            .assertIsDisplayed()
+
+        composeTestRule
+            .onNodeWithText("Move down")
+            .assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `clicking single custom field edit icon shows no move actions in dialog`() {
+        mutableStateFlow.value = DEFAULT_STATE_SECURE_NOTES_CUSTOM_FIELDS.copy(
+            viewState = VaultAddEditState.ViewState.Content(
+                common = VaultAddEditState.ViewState.Content.Common(
+                    customFieldData = listOf(
+                        VaultAddEditState.Custom.BooleanField("Test ID 1", "TestBoolean", false),
+                    ),
+                ),
+                type = VaultAddEditState.ViewState.Content.ItemType.SecureNotes,
+                isIndividualVaultDisabled = false,
+            ),
+        )
+
+        // Expand the additional options UI before interacting with it
+        composeTestRule
+            .onNodeWithTextAfterScroll(text = "Additional options")
+            .performClick()
+
+        composeTestRule
+            .onAllNodesWithContentDescriptionAfterScroll("Edit")
+            .onFirst()
+            .performClick()
+
+        composeTestRule
+            .onNodeWithText("Move Up")
+            .assertIsNotDisplayed()
+
+        composeTestRule
+            .onNodeWithText("Move down")
+            .assertIsNotDisplayed()
     }
 
     @Test
