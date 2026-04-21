@@ -41,6 +41,8 @@ import com.bitwarden.ui.platform.components.dialog.BitwardenTwoButtonDialog
 import com.bitwarden.ui.platform.components.divider.BitwardenHorizontalDivider
 import com.bitwarden.ui.platform.components.model.CardStyle
 import com.bitwarden.ui.platform.components.scaffold.BitwardenScaffold
+import com.bitwarden.ui.platform.components.snackbar.BitwardenSnackbarHost
+import com.bitwarden.ui.platform.components.snackbar.model.rememberBitwardenSnackbarHostState
 import com.bitwarden.ui.platform.components.util.rememberVectorPainter
 import com.bitwarden.ui.platform.composition.LocalIntentManager
 import com.bitwarden.ui.platform.manager.IntentManager
@@ -64,6 +66,7 @@ fun PlanScreen(
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val handlers = remember(viewModel) { PlanHandlers.create(viewModel) }
+    val snackbarHostState = rememberBitwardenSnackbarHostState()
 
     EventsEffect(viewModel = viewModel) { event ->
         when (event) {
@@ -76,6 +79,7 @@ fun PlanScreen(
             }
 
             PlanEvent.NavigateBack -> onNavigateBack()
+            is PlanEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.data)
         }
     }
 
@@ -89,6 +93,9 @@ fun PlanScreen(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
+        snackbarHost = {
+            BitwardenSnackbarHost(bitwardenHostState = snackbarHostState)
+        },
         topBar = {
             BitwardenTopAppBar(
                 title = stringResource(id = BitwardenString.upgrade_to_premium),
@@ -131,6 +138,18 @@ private fun FreeDialogs(
             )
         }
 
+        is PlanState.DialogState.GetPricingError -> {
+            BitwardenTwoButtonDialog(
+                title = dialogState.title(),
+                message = dialogState.message(),
+                confirmButtonText = stringResource(BitwardenString.try_again),
+                dismissButtonText = stringResource(BitwardenString.close),
+                onConfirmClick = handlers.onRetryPricingClick,
+                onDismissClick = handlers.onClosePricingErrorClick,
+                onDismissRequest = handlers.onClosePricingErrorClick,
+            )
+        }
+
         is PlanState.DialogState.WaitingForPayment -> {
             BitwardenTwoButtonDialog(
                 title = stringResource(id = BitwardenString.payment_not_received_yet),
@@ -140,6 +159,20 @@ private fun FreeDialogs(
                 onConfirmClick = handlers.onGoBackClick,
                 onDismissClick = handlers.onCancelWaiting,
                 onDismissRequest = handlers.onCancelWaiting,
+            )
+        }
+
+        is PlanState.DialogState.PendingUpgrade -> {
+            BitwardenTwoButtonDialog(
+                title = stringResource(id = BitwardenString.upgrade_pending),
+                message = stringResource(
+                    id = BitwardenString.upgrade_pending_message,
+                ),
+                confirmButtonText = stringResource(id = BitwardenString.sync_now),
+                dismissButtonText = stringResource(id = BitwardenString.continue_text),
+                onConfirmClick = handlers.onSyncClick,
+                onDismissClick = handlers.onContinueClick,
+                onDismissRequest = handlers.onContinueClick,
             )
         }
 
@@ -210,14 +243,16 @@ private fun PremiumDetailsCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .cardStyle(cardStyle = CardStyle.Full),
+            .cardStyle(
+                cardStyle = CardStyle.Full,
+                // Override bottom padding to account for custom
+                // `BitwardenContentBlock` vertical padding, below.
+                paddingBottom = 0.dp,
+            ),
     ) {
         Column(
             modifier = Modifier
-                .padding(
-                    top = 16.dp,
-                    bottom = 12.dp,
-                )
+                .padding(bottom = 16.dp)
                 .standardHorizontalMargin(),
         ) {
             PriceRow(
@@ -234,9 +269,7 @@ private fun PremiumDetailsCard(
             )
         }
 
-        BitwardenHorizontalDivider(
-            modifier = Modifier.padding(start = 16.dp),
-        )
+        BitwardenHorizontalDivider()
 
         val features = listOf(
             BitwardenString.built_in_authenticator,
@@ -252,7 +285,7 @@ private fun PremiumDetailsCard(
                 ),
                 headerTextStyle = BitwardenTheme.typography.titleMedium,
                 showDivider = index != features.lastIndex,
-                modifier = Modifier.padding(vertical = 6.dp),
+                modifier = Modifier.padding(vertical = 8.dp),
             )
         }
     }
@@ -288,15 +321,23 @@ private fun PlanScreenFreeAccount_preview() {
     BitwardenTheme {
         BitwardenScaffold {
             FreeContent(
-                viewState = PlanState.ViewState.Free(rate = "$1.65"),
+                viewState = PlanState.ViewState.Free(
+                    rate = "$1.67",
+                    checkoutUrl = null,
+                    isAwaitingPremiumStatus = false,
+                ),
                 isDialogShowing = false,
                 handlers = PlanHandlers(
                     onBackClick = {},
                     onUpgradeNowClick = {},
                     onDismissError = {},
                     onRetryClick = {},
+                    onRetryPricingClick = {},
+                    onClosePricingErrorClick = {},
                     onCancelWaiting = {},
                     onGoBackClick = {},
+                    onSyncClick = {},
+                    onContinueClick = {},
                 ),
             )
         }
