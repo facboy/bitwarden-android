@@ -1349,6 +1349,7 @@ class VaultItemListingViewModel @Inject constructor(
                     CipherType.CARD -> VaultItemCipherType.CARD
                     CipherType.IDENTITY -> VaultItemCipherType.IDENTITY
                     CipherType.SSH_KEY -> VaultItemCipherType.SSH_KEY
+                    CipherType.BANK_ACCOUNT -> TODO("PM-32810: Add Bank Account Type")
                 },
             ),
         )
@@ -1370,6 +1371,7 @@ class VaultItemListingViewModel @Inject constructor(
                     CipherType.CARD -> VaultItemCipherType.CARD
                     CipherType.IDENTITY -> VaultItemCipherType.IDENTITY
                     CipherType.SSH_KEY -> VaultItemCipherType.SSH_KEY
+                    CipherType.BANK_ACCOUNT -> TODO("PM-32810: Add Bank Account Type")
                 },
             ),
         )
