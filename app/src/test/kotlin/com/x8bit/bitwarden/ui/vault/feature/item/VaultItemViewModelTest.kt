@@ -2102,6 +2102,17 @@ class VaultItemViewModelTest : BaseViewModelTest() {
 
         @Test
         fun `on CopyNumberClick should call setText on the ClipboardManager`() = runTest {
+            val cardTypeWithFormattedNumber = DEFAULT_CARD_TYPE.copy(
+                number = VaultItemState.ViewState.Content.ItemType.Card.NumberData(
+                    number = "1234 5436",
+                    isVisible = false,
+                ),
+            )
+            viewModel = createViewModel(
+                state = DEFAULT_STATE.copy(
+                    viewState = createViewState(type = cardTypeWithFormattedNumber),
+                ),
+            )
             every {
                 mockCipherView.toViewState(
                     previousState = null,
@@ -2116,7 +2127,7 @@ class VaultItemViewModelTest : BaseViewModelTest() {
                     relatedLocations = persistentListOf(),
                     hasOrganizations = true,
                 )
-            } returns createViewState(type = DEFAULT_CARD_TYPE)
+            } returns createViewState(type = cardTypeWithFormattedNumber)
             mutableVaultItemFlow.value = DataState.Loaded(data = mockCipherView)
             mutableAuthCodeItemFlow.value = DataState.Loaded(data = null)
             mutableCollectionsStateFlow.value = DataState.Loaded(emptyList())
@@ -2129,6 +2140,8 @@ class VaultItemViewModelTest : BaseViewModelTest() {
                     text = "12345436",
                     toastDescriptorOverride = BitwardenString.number.asText(),
                 )
+            }
+            verify(atLeast = 1) {
                 mockCipherView.toViewState(
                     previousState = null,
                     isPremiumUser = true,

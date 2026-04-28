@@ -828,8 +828,9 @@ class VaultItemViewModel @Inject constructor(
 
     private fun handleCopyNumberClick() {
         onCardContent { _, card ->
+            val cardNumber = requireNotNull(card.number).number
             clipboardManager.setText(
-                text = requireNotNull(card.number).number,
+                text = cardNumber.filter { it.isDigit() },
                 toastDescriptorOverride = BitwardenString.number.asText(),
             )
         }
