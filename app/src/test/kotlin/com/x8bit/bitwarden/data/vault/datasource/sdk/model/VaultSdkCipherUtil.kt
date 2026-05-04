@@ -33,7 +33,10 @@ private val FIXED_CLOCK: Clock = Clock.fixed(
 /**
  * Create a mock [Cipher] with a given [number].
  */
-fun createMockSdkCipher(number: Int, clock: Clock = FIXED_CLOCK): Cipher =
+fun createMockSdkCipher(
+    number: Int,
+    clock: Clock = FIXED_CLOCK,
+): Cipher =
     Cipher(
         id = "mockId-$number",
         organizationId = "mockOrganizationId-$number",
@@ -50,11 +53,10 @@ fun createMockSdkCipher(number: Int, clock: Clock = FIXED_CLOCK): Cipher =
         archivedDate = clock.instant(),
         attachments = listOf(createMockSdkAttachment(number = number)),
         card = createMockSdkCard(number = number),
+        bankAccount = createMockSdkBankAccount(number = number),
         fields = listOf(createMockSdkField(number = number)),
         identity = createMockSdkIdentity(number = number),
         sshKey = createMockSdkSshKey(number = number),
-        // TODO: PM-32810: Add Bank Account Type
-        bankAccount = null,
         favorite = false,
         passwordHistory = listOf(createMockSdkPasswordHistory(number = number, clock = clock)),
         permissions = createMockSdkCipherPermissions(),
@@ -134,7 +136,7 @@ fun createMockSdkSshKey(number: Int): SshKey =
 /**
  * Create a mock [BankAccount] with a given [number].
  */
-fun createMockBankAccount(number: Int): BankAccount =
+fun createMockSdkBankAccount(number: Int): BankAccount =
     BankAccount(
         bankName = "mockBankName-$number",
         nameOnAccount = "mockNameOnAccount-$number",
@@ -143,9 +145,9 @@ fun createMockBankAccount(number: Int): BankAccount =
         routingNumber = "mockRoutingNumber-$number",
         branchNumber = "mockBranchNumber-$number",
         pin = "mockPin-$number",
-        swiftCode = "mokSwiftCode-$number",
+        swiftCode = "mockSwiftCode-$number",
         iban = "mockIban-$number",
-        bankContactPhone = "mockBankContractPhone-$number",
+        bankContactPhone = "mockBankContactPhone-$number",
     )
 
 /**

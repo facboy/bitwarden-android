@@ -52,7 +52,6 @@ fun createMockCipherView(
     clock: Clock = FIXED_CLOCK,
     fido2Credentials: List<Fido2Credential>? = null,
     sshKey: SshKeyView? = createMockSshKeyView(number = number),
-    bankAccount: BankAccountView = createMockBankAccountView(number = number),
     login: LoginView? = createMockLoginView(
         number = number,
         password = password,
@@ -61,6 +60,7 @@ fun createMockCipherView(
         fido2Credentials = fido2Credentials,
     ),
     card: CardView? = createMockCardView(number = number).takeIf { cipherType == CipherType.CARD },
+    bankAccount: BankAccountView? = createMockBankAccountView(number = number),
     attachments: List<AttachmentView> = listOf(createMockAttachmentView(number = number)),
     isArchived: Boolean = false,
     passwordHistory: List<PasswordHistoryView> = listOf(
@@ -227,6 +227,36 @@ fun createMockCardView(
     )
 
 /**
+ * Create a mock [BankAccountView] with a given [number].
+ */
+@Suppress("LongParameterList")
+fun createMockBankAccountView(
+    number: Int,
+    bankName: String? = "mockBankName-$number",
+    nameOnAccount: String? = "mockNameOnAccount-$number",
+    accountType: String? = "checking",
+    accountNumber: String? = "mockAccountNumber-$number",
+    routingNumber: String? = "mockRoutingNumber-$number",
+    branchNumber: String? = "mockBranchNumber-$number",
+    pin: String? = "mockPin-$number",
+    swiftCode: String? = "mockSwiftCode-$number",
+    iban: String? = "mockIban-$number",
+    bankContactPhone: String? = "mockBankContactPhone-$number",
+): BankAccountView =
+    BankAccountView(
+        bankName = bankName,
+        nameOnAccount = nameOnAccount,
+        accountType = accountType,
+        accountNumber = accountNumber,
+        routingNumber = routingNumber,
+        branchNumber = branchNumber,
+        pin = pin,
+        swiftCode = swiftCode,
+        iban = iban,
+        bankContactPhone = bankContactPhone,
+    )
+
+/**
  * Create a mock [FieldView] with a given [number].
  */
 fun createMockFieldView(number: Int): FieldView =
@@ -270,23 +300,6 @@ fun createMockSshKeyView(number: Int): SshKeyView =
         publicKey = "mockPublicKey-$number",
         privateKey = "mockPrivateKey-$number",
         fingerprint = "mockKeyFingerprint-$number",
-    )
-
-/**
- * Create a mock [BankAccountView] with a given [number].
- */
-fun createMockBankAccountView(number: Int): BankAccountView =
-    BankAccountView(
-        bankName = "mockBankName-$number",
-        nameOnAccount = "mockNameOnAccount-$number",
-        accountType = "mockAccountType-$number",
-        accountNumber = "mockAccountNumber-$number",
-        routingNumber = "mockRoutingNumber-$number",
-        branchNumber = "mockBranchNumber-$number",
-        pin = "mockPin-$number",
-        swiftCode = "mokSwiftCode-$number",
-        iban = "mockIban-$number",
-        bankContactPhone = "mockBankContractPhone-$number",
     )
 
 /**
